@@ -127,5 +127,4 @@ npm run dev:full
 
 ## Credits
 
-- Frontend app and integration: Gourav Shetty
 - ML model implementation: [MirzaMD](https://github.com/MirzaMD) via [traffic-model](https://github.com/MirzaMD/traffic-model.git)
