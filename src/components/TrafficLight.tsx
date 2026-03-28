@@ -1,5 +1,4 @@
 import { Text } from '@react-three/drei';
-import { useMemo } from 'react';
 
 interface TrafficLightProps {
   position: [number, number, number];

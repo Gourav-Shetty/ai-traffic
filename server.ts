@@ -1,12 +1,7 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs";
 import Database from "better-sqlite3";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Initialize SQLite Database
 // File: traffic_history.db (located in the root directory)
@@ -60,25 +55,76 @@ async function startServer() {
   console.log("Starting local server with SQLite...");
   const app = express();
   const PORT = 4000;
-  const mlApiUrl = process.env.ML_API_URL || "http://127.0.0.1:8000";
+  const localMlBaseUrl = (process.env.LOCAL_ML_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+  const fallbackMlUrl = (process.env.ML_API_URL || "https://traffic-model-1.onrender.com/predict").replace(/\/+$/, "");
+  const localPredictUrl = `${localMlBaseUrl}/predict`;
+  const fallbackPredictUrl = fallbackMlUrl.endsWith("/predict")
+    ? fallbackMlUrl
+    : `${fallbackMlUrl}/predict`;
+  const localTimeoutMs = Number(process.env.LOCAL_ML_TIMEOUT_MS || 1200);
+  const fallbackTimeoutMs = Number(process.env.FALLBACK_ML_TIMEOUT_MS || 60000);
+  const localRetryCooldownMs = Number(process.env.LOCAL_ML_RETRY_COOLDOWN_MS || 30000);
+  let localMlDownUntil = 0;
+
+  async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  function isAbortError(error: unknown): boolean {
+    return error instanceof Error && error.name === "AbortError";
+  }
 
   app.use(express.json());
 
   // API routes
-  app.get("/api/health", (req, res) => {
+  app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", database: "sqlite" });
   });
 
   // Proxy prediction requests to FastAPI ML service.
   app.post("/api/ml/predict", async (req, res) => {
-    try {
-      const response = await fetch(`${mlApiUrl}/predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(req.body),
-      });
+    const requestInit: RequestInit = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    };
 
-      const result = await response.json();
+    try {
+      // Prefer local model when reachable, then fail over to remote endpoint.
+      // When local is down, skip it briefly to avoid repeated timeout penalties.
+      let response: Response | null = null;
+      const shouldTryLocal = Date.now() >= localMlDownUntil;
+
+      if (shouldTryLocal) {
+        try {
+          response = await fetchWithTimeout(localPredictUrl, requestInit, localTimeoutMs);
+          localMlDownUntil = 0;
+        } catch {
+          localMlDownUntil = Date.now() + localRetryCooldownMs;
+        }
+      }
+
+      if (!response) {
+        try {
+          response = await fetchWithTimeout(fallbackPredictUrl, requestInit, fallbackTimeoutMs);
+        } catch (fallbackError) {
+          if (isAbortError(fallbackError)) {
+            return res.status(504).json({
+              error: "Fallback ML request timed out",
+              details: "Hosted model may be cold-starting; retry in a few seconds.",
+            });
+          }
+          throw fallbackError;
+        }
+      }
+
+      const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         return res.status(response.status).json({
           error: "ML inference failed",
@@ -89,12 +135,12 @@ async function startServer() {
       return res.json(result);
     } catch (error) {
       console.error("ML proxy error:", error);
-      return res.status(502).json({ error: "Unable to reach ML service" });
+      return res.status(502).json({ error: "Unable to reach local or fallback ML service" });
     }
   });
 
   // Get all simulations
-  app.get("/api/simulations", (req, res) => {
+  app.get("/api/simulations", (_req, res) => {
     const rows = db.prepare("SELECT * FROM simulations").all();
     const simulations = rows.reduce((acc: any, row: any) => {
       acc[row.id] = {
@@ -190,7 +236,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
+    app.get("*", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }

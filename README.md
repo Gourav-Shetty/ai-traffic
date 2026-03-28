@@ -1,37 +1,131 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Traffic AI Simulation
 
-# Run and deploy your app
+A real-time intelligent traffic simulation app with:
 
-This contains everything you need to run your app locally.
+- network-level junction coordination
+- dynamic lane timing optimization
+- emergency priority handling
+- live congestion visualization on an interactive map
+- local-first ML inference with automatic fallback to hosted API
 
-## Run Locally
+Built with React + TypeScript on the frontend, Express + SQLite on the backend, and a FastAPI model service.
 
-**Prerequisites:**  Node.js
+## Preview
 
+![Traffic AI App Screenshot 1](./Screenshot%202026-03-28%20170726.png)
+![Traffic AI App Screenshot 2](./Screenshot%202026-03-28%20170758.png)
+
+## Features
+
+- Real-time multi-junction simulation state updates
+- Congestion-aware adaptive signal timing
+- Emergency vehicle corridor and priority logic
+- Leaflet-based live map with clustering and heat overlay
+- SQLite-backed simulation/history persistence
+- ML proxy endpoint with local-first failover:
+  - tries local model first (`LOCAL_ML_API_URL`)
+  - falls back to hosted model (`ML_API_URL`) when local is unavailable
+
+## Tech Stack
+
+- Frontend: React 19, TypeScript, Vite, Tailwind CSS, React Three Fiber, Recharts
+- Map: Leaflet, React Leaflet, leaflet.heat
+- Backend: Express, better-sqlite3
+- ML Service: FastAPI (Poetry-managed in `ml_model`)
+
+## Project Structure
+
+```text
+traffic-ai-simulation1/
+  src/                  # React frontend
+  server.ts             # Express API + Vite dev server + SQLite integration
+  ml_model/             # FastAPI ML model service
+  traffic_history.db    # Local SQLite database (runtime-generated)
+```
+
+## Quick Start (App Only)
+
+Prerequisite: Node.js 18+
 
 1. Install dependencies:
-   `npm install`
-2. Run the app:
-   `npm run dev`
 
-## Run With ML Model (Poetry)
+```bash
+npm install
+```
 
-The Express server proxies ML requests to `http://127.0.0.1:8000` by default (`ML_API_URL` can override it).
+2. Run the app server:
 
-1. Install frontend dependencies:
-   `npm install`
-2. Install Python dependencies for the model (inside `ml_model`):
-   `cd ml_model`
-   `.\.venv\Scripts\poetry.exe install`
-3. Start only the ML API (from workspace root):
-   `npm run ml:dev`
-4. Start only the React/Express app:
-   `npm run dev`
+```bash
+npm run dev
+```
 
-Or run both together from workspace root:
+3. Open:
 
-`npm run dev:full`
+```text
+http://localhost:4000
+```
 
-If `poetry` is not recognized globally on Windows, this repo uses the in-project executable at `ml_model\.venv\Scripts\poetry.exe`.
+## ML Routing Behavior
+
+The app backend (`server.ts`) uses this strategy for `/api/ml/predict`:
+
+1. Try local model first (`LOCAL_ML_API_URL`, default `http://127.0.0.1:8000`)
+2. If local is unreachable, automatically fallback to hosted model (`ML_API_URL`)
+
+Default fallback is Render-hosted model:
+
+```text
+https://traffic-model-1.onrender.com/predict
+```
+
+## Environment Variables
+
+Use `.env.example` as reference:
+
+- `APP_URL`: Optional app URL for links/callbacks
+- `LOCAL_ML_API_URL`: Local FastAPI base URL
+- `ML_API_URL`: Hosted fallback ML URL (base URL or full `/predict` URL)
+
+## Running Local ML Service (Optional)
+
+If you want local ML during development:
+
+1. Install model dependencies:
+
+```powershell
+cd ml_model
+.\.venv\Scripts\poetry.exe install
+```
+
+2. Run local model API:
+
+```powershell
+.\.venv\Scripts\poetry.exe run uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+From workspace root, combined app + local ML can be run with:
+
+```bash
+npm run dev:full
+```
+
+## Available Scripts
+
+- `npm run dev`: start Express + Vite middleware dev server
+- `npm run ml:dev`: start local FastAPI model via Poetry
+- `npm run dev:full`: run app + local ML together
+- `npm run build`: production build
+- `npm run preview`: preview built frontend
+- `npm run lint`: TypeScript type-check
+
+## Deployment Notes
+
+- This project can be deployed with split architecture:
+  - app server/frontend on one platform
+  - ML service on another platform (for example Render)
+- Keep `ML_API_URL` set to your hosted model endpoint in production.
+
+## Credits
+
+- Frontend app and integration: Gourav Shetty
+- ML model implementation: [MirzaMD](https://github.com/MirzaMD) via [traffic-model](https://github.com/MirzaMD/traffic-model.git)

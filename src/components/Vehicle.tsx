@@ -225,7 +225,7 @@ export function Vehicle({ id, lane, initialOffset, color, isEmergency, isGreen, 
     };
   }, [id, vehiclePositions]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!meshRef.current) return;
 
     // Update shared state with current world position

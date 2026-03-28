@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, Stars, Float, Html, Text } from '@react-three/drei';
+import { OrbitControls, Html, Text } from '@react-three/drei';
 import { Road } from './Road';
 import { TrafficLight } from './TrafficLight';
 import { Vehicle, VehicleType, TurnDirection } from './Vehicle';

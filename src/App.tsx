@@ -164,8 +164,7 @@ function calculateNetworkMetrics(allSimulations: Record<string, SimulationState>
  */
 function generateCoordinationRequest(
   junctionId: string,
-  sim: SimulationState,
-  allSimulations: Record<string, SimulationState>
+  sim: SimulationState
 ): CoordinationRequest | null {
   const { congestionLevel } = sim;
   
@@ -472,7 +471,6 @@ function normalizeSimulation(raw: Partial<SimulationState> | undefined, id: stri
 }
 
 export default function App() {
-  const [simulations, setSimulations] = useState<Record<string, SimulationState>>({});
   const [localSimulations, setLocalSimulations] = useState<Record<string, SimulationState>>({});
   const [selectedJunctionId, setSelectedJunctionId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -588,7 +586,6 @@ export default function App() {
           };
         }
         
-        setSimulations(initializedSims);
         setLocalSimulations(initializedSims);
         setIsInitialized(true);
       } catch (err) {
@@ -762,13 +759,13 @@ export default function App() {
           const neighborStates = buildNeighborStates(junction.id, next);
 
           // COORDINATION PHASE 1: Generate our own coordination request if needed
-          const ourCoordinationRequest = generateCoordinationRequest(junction.id, sim, next);
+          const ourCoordinationRequest = generateCoordinationRequest(junction.id, sim);
 
           // COORDINATION PHASE 2: Collect all neighbor requests (neighbors asking us for help)
           const incomingRequests: CoordinationRequest[] = [];
           const incomingConnections = getIncomingConnectionsTo(junction.id);
           for (const { fromJunction } of incomingConnections) {
-            const neighborRequest = generateCoordinationRequest(fromJunction, next[fromJunction], next);
+            const neighborRequest = generateCoordinationRequest(fromJunction, next[fromJunction]);
             if (neighborRequest) {
               incomingRequests.push(neighborRequest);
             }
