@@ -12,7 +12,7 @@ This service exposes a prediction API used by the React/Express app.
 From `ml_model`:
 
 ```powershell
-.\.venv\Scripts\poetry.exe install
+.\.venv\Scripts\python.exe -m poetry install
 ```
 
 ## Run Service
@@ -20,7 +20,7 @@ From `ml_model`:
 From `ml_model`:
 
 ```powershell
-.\.venv\Scripts\poetry.exe run uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
+.\.venv\Scripts\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Health check:
@@ -32,14 +32,14 @@ Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/openapi.json
 ## Common Issue: `poetry` Not Found
 
 If `poetry --version` fails, Poetry is not on PATH in your shell.
-Use the repo-local executable directly:
+Use the repo-local Python entry point directly (also safer if the project folder moved):
 
 ```powershell
-.\.venv\Scripts\poetry.exe <command>
+.\.venv\Scripts\python.exe -m poetry <command>
 ```
 
 Example:
 
 ```powershell
-.\.venv\Scripts\poetry.exe run uvicorn src.main:app --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000
 ```

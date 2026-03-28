@@ -94,13 +94,13 @@ If you want local ML during development:
 
 ```powershell
 cd ml_model
-.\.venv\Scripts\poetry.exe install
+.\.venv\Scripts\python.exe -m poetry install
 ```
 
 2. Run local model API:
 
 ```powershell
-.\.venv\Scripts\poetry.exe run uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
+.\.venv\Scripts\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 From workspace root, combined app + local ML can be run with:
