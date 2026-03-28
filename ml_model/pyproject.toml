@@ -1,0 +1,26 @@
+[project]
+name = "ai-backend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mirza Hussain", email = "mohammedhussain2727@gmail.com"}
+]
+requires-python = ">=3.10,<3.12"
+
+dependencies = [
+    "fastapi (>=0.135.2,<0.136.0)",
+    "numpy (<2.0.0)",
+    "pandas (<2.1.0)",
+    "joblib (>=1.2.0,<2.0.0)",
+    "scikit-learn (==1.2.2)",
+    "uvicorn (>=0.42.0,<0.43.0)",
+    "motor (>=3.7.1,<4.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

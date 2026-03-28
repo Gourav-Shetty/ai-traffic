@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  #root {
+    @apply h-screen w-screen overflow-hidden;
+  }
+  body {
+    @apply bg-[#050505] text-white antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+}
+
+/* Custom Range Input Styling */
+input[type="range"]::-webkit-slider-thumb {
+  @apply appearance-none w-4 h-4 bg-[#F27D26] rounded-full border-2 border-[#050505] shadow-[0_0_10px_rgba(242,125,38,0.5)] cursor-pointer transition-all hover:scale-125;
+}
+
+input[type="range"]::-moz-range-thumb {
+  @apply w-4 h-4 bg-[#F27D26] rounded-full border-2 border-[#050505] shadow-[0_0_10px_rgba(242,125,38,0.5)] cursor-pointer transition-all hover:scale-125;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  @apply w-1;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20;
+}
+
+.leaflet-container {
+  background: #050505;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #ffffff;
+}
+
+.leaflet-popup-content {
+  margin: 10px 12px;
+}
+
+.cluster-label {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.cluster-label::before {
+  display: none;
+}
+
