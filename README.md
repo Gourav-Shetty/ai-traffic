@@ -1,37 +1,104 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Traffic AI Simulation
 
-# Run and deploy your app
+Traffic signal simulation with a React + Express app and a FastAPI ML backend.
 
-This contains everything you need to run your app locally.
+## Architecture
 
-## Run Locally
+- Frontend + API server: Node/Express + Vite on port `4000`
+- ML backend: FastAPI on port `8000`
+- Node server proxies prediction calls from `/api/ml/predict` to the ML backend
 
-**Prerequisites:**  Node.js
+The proxy target is resolved in this order:
 
+1. `LOCAL_ML_API_URL`
+2. `ML_API_URL`
+3. `http://localhost:8000` (default)
 
-1. Install dependencies:
-   `npm install`
-2. Run the app:
-   `npm run dev`
+## Prerequisites
 
-## Run With ML Model (Poetry)
+- Node.js 20+
+- Python 3.10 or 3.11
+- Docker Desktop (optional, for containerized run)
 
-The Express server proxies ML requests to `http://127.0.0.1:8000` by default (`ML_API_URL` can override it).
+## Run With Docker (recommended)
 
-1. Install frontend dependencies:
-   `npm install`
-2. Install Python dependencies for the model (inside `ml_model`):
-   `cd ml_model`
-   `.\.venv\Scripts\poetry.exe install`
-3. Start only the ML API (from workspace root):
-   `npm run ml:dev`
-4. Start only the React/Express app:
-   `npm run dev`
+From project root:
 
-Or run both together from workspace root:
+```powershell
+docker compose up --build
+```
 
-`npm run dev:full`
+Open:
 
-If `poetry` is not recognized globally on Windows, this repo uses the in-project executable at `ml_model\.venv\Scripts\poetry.exe`.
+- App: `http://localhost:4000`
+- ML docs: `http://localhost:8000/docs`
+
+Stop:
+
+```powershell
+docker compose down
+```
+
+## Run Locally (without Docker)
+
+### 1) Install Node dependencies
+
+```powershell
+npm install
+```
+
+### 2) Start ML backend locally
+
+From project root:
+
+```powershell
+npm run ml:dev
+```
+
+This uses `ml_model/.venv/Scripts/python.exe -m uvicorn ...`.
+
+### 3) Start app server
+
+In another terminal:
+
+```powershell
+npm run dev
+```
+
+Or start both together:
+
+```powershell
+npm run dev:full
+```
+
+## Render / Cloud ML Mode
+
+If your ML backend is deployed on Render, set one of these environment variables for the Node server:
+
+- `LOCAL_ML_API_URL=https://your-ml-service.onrender.com`
+- or `ML_API_URL=https://your-ml-service.onrender.com`
+
+Then start the app with `npm run dev`.
+
+## Environment Variables
+
+See `.env.example` for defaults:
+
+- `LOCAL_ML_API_URL`
+- `ML_API_URL` (backward-compatible fallback)
+- `APP_URL`
+
+## Useful Commands
+
+```powershell
+npm run lint
+npm run build
+docker compose ps
+docker compose logs app --tail 100
+docker compose logs ml --tail 100
+```
+
+## Notes
+
+- `ml_model/src/models/artifacts.pkl` requires `scikit-learn==1.2.2`.
+- Docker setup pins compatible Python package versions in `ml_model/Dockerfile`.

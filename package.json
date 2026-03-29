@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "ml:dev": "cd ml_model && .\\.venv\\Scripts\\poetry.exe run uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload",
+    "ml:dev": "cd ml_model && .\\.venv\\Scripts\\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload",
     "dev:full": "concurrently -n app,ml -c blue,green \"npm:dev\" \"npm:ml:dev\"",
     "build": "vite build",
     "preview": "vite preview",
