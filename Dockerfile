@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Rebuild native modules for Linux (better-sqlite3, etc.)
+RUN npm rebuild
+
 # Copy application source
 COPY . .
 

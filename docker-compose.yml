@@ -8,12 +8,6 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
 
   app:
     build: .
@@ -21,8 +15,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      ml:
-        condition: service_healthy
+      - ml
     environment:
       - LOCAL_ML_API_URL=http://ml:8000
       - NODE_ENV=development

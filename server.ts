@@ -60,7 +60,7 @@ async function startServer() {
   console.log("Starting local server with SQLite...");
   const app = express();
   const PORT = 4000;
-  const mlApiUrl = process.env.ML_API_URL || "http://127.0.0.1:8000";
+  const mlApiUrl = process.env.LOCAL_ML_API_URL || "http://localhost:8000";
 
   app.use(express.json());
 
