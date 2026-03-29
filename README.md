@@ -125,6 +125,12 @@ npm run dev:full
   - ML service on another platform (for example Render)
 - Keep `ML_API_URL` set to your hosted model endpoint in production.
 
+## Docker Branch
+
+- A dedicated Docker setup is available on the `docker` branch.
+- Branch link: https://github.com/Gourav-Shetty/ai-traffic/tree/docker
+- Use that branch if you want full local containerized run with Docker Compose.
+
 ## Credits
 
 - ML model implementation: [MirzaMD](https://github.com/MirzaMD) via [traffic-model](https://github.com/MirzaMD/traffic-model.git)
