@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Simulation } from './components/Simulation';
 import { ControlPanel } from './components/ControlPanel';
 import { NetworkMap } from './components/NetworkMap';
-import { Activity, ChevronDown, ChevronUp } from 'lucide-react';
+import { Activity, Camera, CameraOff, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LaneDebugMetrics, 
@@ -475,6 +475,8 @@ export default function App() {
   const [selectedJunctionId, setSelectedJunctionId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [simulationSpeed, setSimulationSpeed] = useState(1);
+  const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [modelPredictions, setModelPredictions] = useState<Record<string, ModelPredictionState>>({});
   const [laneDebugMetrics, setLaneDebugMetrics] = useState<LaneDebugMetrics[]>([]);
   const [isDebugPanelCollapsed, setIsDebugPanelCollapsed] = useState(true);
@@ -485,6 +487,19 @@ export default function App() {
   const transitPacketsRef = useRef<TransitPacket[]>([]);
   const linkFlowDebugRef = useRef<Record<string, LinkFlowDebugRow>>({});
   const corridorPlansRef = useRef<Record<string, EmergencyCorridorPlan>>({});
+  const cameraVideoRef = useRef<HTMLVideoElement | null>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+
+  const stopCameraStream = useCallback(() => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+      cameraStreamRef.current = null;
+    }
+
+    if (cameraVideoRef.current) {
+      cameraVideoRef.current.srcObject = null;
+    }
+  }, []);
 
   useEffect(() => {
     NETWORK.forEach((junction) => {
@@ -504,6 +519,66 @@ export default function App() {
   useEffect(() => {
     latestSimulationsRef.current = localSimulations;
   }, [localSimulations]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const startCamera = async () => {
+      if (!cameraEnabled) {
+        setCameraError(null);
+        stopCameraStream();
+        return;
+      }
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError('Camera is not supported in this browser.');
+        setCameraEnabled(false);
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+
+        if (cancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        stopCameraStream();
+        cameraStreamRef.current = stream;
+        setCameraError(null);
+
+        if (cameraVideoRef.current) {
+          cameraVideoRef.current.srcObject = stream;
+          cameraVideoRef.current.play().catch(() => {});
+        }
+      } catch (error) {
+        setCameraError('Could not access camera. Please allow permission.');
+        setCameraEnabled(false);
+      }
+    };
+
+    startCamera();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cameraEnabled, stopCameraStream]);
+
+  useEffect(() => {
+    if (!selectedJunctionId && cameraEnabled) {
+      setCameraEnabled(false);
+    }
+  }, [cameraEnabled, selectedJunctionId]);
+
+  useEffect(() => {
+    return () => {
+      stopCameraStream();
+    };
+  }, [stopCameraStream]);
 
   // Sync from Local SQLite Database
   useEffect(() => {
@@ -1161,6 +1236,44 @@ export default function App() {
                   predictionSource={selectedPrediction?.source ?? null}
                   predictionUpdatedAt={selectedPrediction?.updatedAt ?? null}
                 />
+
+                <div className="absolute bottom-8 left-8 z-30 pointer-events-auto">
+                  <div className="w-[320px] bg-[#151619]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-white/50">Live Camera</span>
+                      <button
+                        type="button"
+                        onClick={() => setCameraEnabled((prev) => !prev)}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-widest border transition-colors ${cameraEnabled ? 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/20' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'}`}
+                      >
+                        {cameraEnabled ? <CameraOff className="w-3.5 h-3.5" /> : <Camera className="w-3.5 h-3.5" />}
+                        {cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
+                      </button>
+                    </div>
+
+                    <div className="relative w-full h-[180px] bg-black">
+                      {cameraEnabled ? (
+                        <video
+                          ref={cameraVideoRef}
+                          autoPlay
+                          muted
+                          playsInline
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-[11px] text-white/40 uppercase tracking-widest">
+                          Camera is off
+                        </div>
+                      )}
+
+                      {cameraError && (
+                        <div className="absolute inset-0 bg-black/70 flex items-center justify-center p-4 text-center text-[11px] text-red-300">
+                          {cameraError}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
                 
                 {/* Overlay HUD */}
                 <div className="absolute top-8 left-8 pointer-events-none z-20">
@@ -1174,7 +1287,7 @@ export default function App() {
                     </h2>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Live Simulation Active</span>
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Live Traffic Control Active</span>
                     </div>
                     {selectedSim.relievingNeighbor && (
                       <div className="mt-2 inline-flex items-center gap-2 bg-[#F27D26]/20 text-[#F27D26] px-3 py-1.5 rounded-lg border border-[#F27D26]/30">

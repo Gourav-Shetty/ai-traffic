@@ -1,6 +1,6 @@
-# Traffic AI Simulation
+# Traffic AI Control Platform
 
-A real-time intelligent traffic simulation app with:
+A real-time intelligent traffic operations app with:
 
 - network-level junction coordination
 - dynamic lane timing optimization
@@ -17,11 +17,11 @@ Built with React + TypeScript on the frontend, Express + SQLite on the backend, 
 
 ## Features
 
-- Real-time multi-junction simulation state updates
+- Real-time multi-junction traffic state updates
 - Congestion-aware adaptive signal timing
 - Emergency vehicle corridor and priority logic
 - Leaflet-based live map with clustering and heat overlay
-- SQLite-backed simulation/history persistence
+- SQLite-backed traffic/history persistence
 - ML proxy endpoint with local-first failover:
   - tries local model first (`LOCAL_ML_API_URL`)
   - falls back to hosted model (`ML_API_URL`) when local is unavailable
@@ -36,7 +36,7 @@ Built with React + TypeScript on the frontend, Express + SQLite on the backend, 
 ## Project Structure
 
 ```text
-traffic-ai-simulation1/
+traffic-ai-control-platform/
   src/                  # React frontend
   server.ts             # Express API + Vite dev server + SQLite integration
   ml_model/             # FastAPI ML model service

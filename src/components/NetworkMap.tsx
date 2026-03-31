@@ -247,7 +247,7 @@ function ClusteredJunctionMarkers({
                     onClick={() => onSelectJunction(single.id)}
                     className="w-full py-2 mt-2 bg-[#050505] text-white hover:bg-[#1a1a1a] rounded-lg text-sm font-bold transition-colors"
                   >
-                    View Simulation
+                    Open Junction Control
                   </button>
                 </div>
               </Popup>
@@ -343,7 +343,7 @@ export function NetworkMap({ simulations, modelPredictions, onSelectJunction }: 
           <h2 className="text-2xl font-black tracking-tighter uppercase leading-none text-white">
             Traffic<span className="text-[#F27D26]">AI</span> Network
           </h2>
-          <p className="text-xs text-white/60">Select a junction to view live simulation</p>
+          <p className="text-xs text-white/60">Select a junction to monitor and control live traffic</p>
         </motion.div>
       </div>
     </div>

@@ -131,11 +131,11 @@ export function ControlPanel({
             className="px-6 pb-6 overflow-y-auto"
           >
             <div className="space-y-8 pt-6">
-              {/* Simulation Speed */}
+              {/* Control Loop Speed */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/40">
                   <FastForward className="w-3 h-3" />
-                  <span>Simulation Speed</span>
+                  <span>Control Loop Speed</span>
                 </div>
                 
                 <div className="space-y-2">
