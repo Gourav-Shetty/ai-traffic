@@ -15,7 +15,9 @@ services:
     depends_on:
       - ml
     environment:
+      - APP_URL=http://localhost:4000
       - LOCAL_ML_API_URL=http://ml:8000
+      - ML_API_URL=http://ml:8000
       - NODE_ENV=development
     volumes:
       - ./src:/app/src

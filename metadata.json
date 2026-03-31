@@ -1,5 +1,7 @@
 {
   "name": "Traffic-AI Simulation",
   "description": "A 3D traffic simulation powered by AI and real-time updates.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

@@ -33,6 +33,12 @@ Open:
 - App: `http://localhost:4000`
 - ML docs: `http://localhost:8000/docs`
 
+Camera feature notes (Docker):
+
+- Use `http://localhost:4000` for local webcam access in browser.
+- If you open the app from another device/IP (for example `http://192.168.x.x:4000`), most browsers require HTTPS for camera access.
+- Grant camera permission in the browser prompt when you click the camera toggle.
+
 Stop:
 
 ```powershell
