@@ -16,6 +16,8 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@tailwindcss/vite": "^4.1.14",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs": "^4.22.0",
     "@types/three": "^0.183.1",
     "@vitejs/plugin-react": "^5.0.4",
     "better-sqlite3": "^12.8.0",
