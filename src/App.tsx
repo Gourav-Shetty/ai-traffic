@@ -488,6 +488,8 @@ export default function App() {
   const corridorPlansRef = useRef<Record<string, EmergencyCorridorPlan>>({});
 
   useEffect(() => {
+    document.title = 'Traffic AI Control Platform - Demo';
+
     NETWORK.forEach((junction) => {
       if (lanePointerRef.current[junction.id] === undefined) {
         lanePointerRef.current[junction.id] = 0;
