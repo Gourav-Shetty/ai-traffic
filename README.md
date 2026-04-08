@@ -9,12 +9,10 @@ A real-time intelligent traffic operations app with:
 - local-first ML inference with automatic fallback to hosted API
 
 Built with React + TypeScript on the frontend, Express + SQLite on the backend, and a FastAPI model service.
-
 ## Preview
 
 ![Traffic AI App Screenshot 1](./Screenshot%202026-03-28%20170726.png)
 ![Traffic AI App Screenshot 2](./Screenshot%202026-03-28%20170758.png)
-
 ## Features
 
 - Real-time multi-junction traffic state updates
@@ -25,14 +23,12 @@ Built with React + TypeScript on the frontend, Express + SQLite on the backend, 
 - ML proxy endpoint with local-first failover:
   - tries local model first (`LOCAL_ML_API_URL`)
   - falls back to hosted model (`ML_API_URL`) when local is unavailable
-
 ## Tech Stack
 
 - Frontend: React 19, TypeScript, Vite, Tailwind CSS, React Three Fiber, Recharts
 - Map: Leaflet, React Leaflet, leaflet.heat
 - Backend: Express, better-sqlite3
 - ML Service: FastAPI (Poetry-managed in `ml_model`)
-
 ## Project Structure
 
 ```text
@@ -42,7 +38,6 @@ traffic-ai-control-platform/
   ml_model/             # FastAPI ML model service
   traffic_history.db    # Local SQLite database (runtime-generated)
 ```
-
 ## Quick Start (App Only)
 
 Prerequisite: Node.js 18+
@@ -64,7 +59,6 @@ npm run dev
 ```text
 http://localhost:4000
 ```
-
 ## ML Routing Behavior
 
 The app backend (`server.ts`) uses this strategy for `/api/ml/predict`:
@@ -77,7 +71,6 @@ Default fallback is Render-hosted model:
 ```text
 https://traffic-model-1.onrender.com/predict
 ```
-
 ## Environment Variables
 
 Use `.env.example` as reference:
@@ -85,7 +78,6 @@ Use `.env.example` as reference:
 - `APP_URL`: Optional app URL for links/callbacks
 - `LOCAL_ML_API_URL`: Local FastAPI base URL
 - `ML_API_URL`: Hosted fallback ML URL (base URL or full `/predict` URL)
-
 ## Running Local ML Service (Optional)
 
 If you want local ML during development:
@@ -108,7 +100,6 @@ From workspace root, combined app + local ML can be run with:
 ```bash
 npm run dev:full
 ```
-
 ## Available Scripts
 
 - `npm run dev`: start Express + Vite middleware dev server
@@ -117,15 +108,12 @@ npm run dev:full
 - `npm run build`: production build
 - `npm run preview`: preview built frontend
 - `npm run lint`: TypeScript type-check
-
 ## Deployment Notes
 
 - This project can be deployed with split architecture:
   - app server/frontend on one platform
   - ML service on another platform (for example Render)
 - Keep `ML_API_URL` set to your hosted model endpoint in production.
-
-
 ## Credits
 
 - ML model implementation: [MirzaMD](https://github.com/MirzaMD) via [traffic-model](https://github.com/MirzaMD/traffic-model.git)
