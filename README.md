@@ -1,14 +1,16 @@
 # Traffic AI Control Platform
 
-A real-time intelligent traffic operations app with:
+_Auto-generated fallback update (LLM quota exceeded)._
 
-- network-level junction coordination
-- dynamic lane timing optimization
-- emergency priority handling
-- live congestion visualization on an interactive map
-- local-first ML inference with automatic fallback to hosted API
+### Recent PR Impact
+The following files changed and likely require documentation alignment:
 
-Built with React + TypeScript on the frontend, Express + SQLite on the backend, and a FastAPI model service.
+- `src/App.tsx`
+
+### Suggested Documentation Checks
+- Validate setup and usage examples
+- Verify API/function behavior descriptions
+- Confirm command-line or configuration references
 ## Preview
 
 ![Traffic AI App Screenshot 1](./Screenshot%202026-03-28%20170726.png)
@@ -81,14 +83,12 @@ Use `.env.example` as reference:
 ## Running Local ML Service (Optional)
 
 _Auto-generated fallback update (LLM quota exceeded)._
-
 ### Recent PR Impact
 The following files changed and likely require documentation alignment:
 
 - `Dockerfile`
 - `docker-compose.yml`
 - `ml_model/Dockerfile`
-
 ### Suggested Documentation Checks
 - Validate setup and usage examples
 - Verify API/function behavior descriptions
